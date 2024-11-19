@@ -1,4 +1,5 @@
 'use client';
+import { createSharpTexture } from '@/utils/three.utils';
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -38,6 +39,7 @@ const ViewPort = () => {
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(100, 100);
         groundTexture.anisotropy = 16;
+        groundTexture.magFilter = THREE.NearestFilter;
         groundTexture.encoding = THREE.sRGBEncoding;
 
         var groundMaterial = new THREE.MeshStandardMaterial({ map: groundTexture });
@@ -88,31 +90,33 @@ const ViewPort = () => {
     }, [])
 
     const addGrass = () => {
-        let texture = new THREE.TextureLoader().load("textures/grass.jpg");
+        let loader = new THREE.TextureLoader();
+        loader.setPath("textures/grass/");
 
-        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        texture.repeat.set(100, 100);
-        texture.anisotropy = 16;
-        // texture.encoding = THREE.sRGBEncoding;
+        const material = [
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'side.png') }),
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'side2.png') }),
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'top.png') }),
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'bottom.png') }),
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'side3.png') }),
+            new THREE.MeshStandardMaterial({ map: createSharpTexture(loader, 'side4.png') }),
+        ];
 
-        let material = new THREE.MeshStandardMaterial({ map: texture });
-
-        let mesh = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), material);
+        let mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), material);
         mesh.position.y = Math.random() * 5;
         mesh.position.x = Math.random() * 5;
         mesh.position.z = Math.random() * 5;
-        // mesh.rotation.x = - Math.random() * 5;
         mesh.receiveShadow = true;
         scene.add(mesh)
     }
 
     return (
-        <>
-            <button onClick={addGrass}>
+        <div>
+            <button className='absolute z-10 bg-gray-400 p-2 rounded-xl' onClick={addGrass}>
                 add grass
             </button>
             <div id="canvas"></div>
-        </>
+        </div>
     )
 }
 
